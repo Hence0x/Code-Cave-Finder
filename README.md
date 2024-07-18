@@ -11,7 +11,7 @@ The program scans through the sections of a PE file, looking for continuous sequ
 1. Run the program with a PE file as an argument:
 
    ```
-   cave_finder.exe <path_to_pe_file>
+   cave_finder.exe <path_to_pe_file> <size>
    ```
 
 ## Output
@@ -22,8 +22,3 @@ The program will print out the locations and sizes of any code caves it finds, l
 cave found in .text at 0x1000, size: 100 bytes
 cave found in .data at 0x2000, size: 200 bytes
 ```
-
-
-## Todo
-
-- [ ] Add option to specify minimum cave size
