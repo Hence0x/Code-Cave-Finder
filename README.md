@@ -4,7 +4,7 @@ This tool finds code caves in PE (Portable Executable) files.
 
 ## How it works
 
-The program scans through the sections of a PE file, looking for continuous sequences of zero bytes. When it finds a sequence longer than the minimum cave size (default: 50 bytes), it reports the location and size of the cave.
+The program scans through the sections of a PE file, looking for continuous sequences of zero bytes. When it finds a sequence longer than the minimum cave size, it reports the location and size of the cave.
 
 ## Usage
 
