@@ -1,40 +1,57 @@
-/*
- * File: main.c
- * Author: Hence0x
- * Date: 7/26/2024
- * 
- * Description:
- * This program analyzes Portable Executable (PE) files to find "caves" - 
- * contiguous areas of zero bytes within the file. It's useful for identifying
- * potential areas where additional code or data could be inserted without
- * changing the file's size.
- * 
- * Usage:
- * pe_cave_finder.exe <PE_file> <min_cave_size>
- * 
- * Compilation:
- * Compile with Visual Studio or using gcc with the following command:
- * gcc -o pe_cave_finder pe_cave_finder.c
- */
+///-------------------------------------------------------------------------------------------------
+/// <summary>
+/// File: main.c
+/// 
+/// This file contains the implementation of a tool to find code caves in PE (Portable Executable) files.
+/// Code caves are continuous sequences of zero bytes within the file, which can potentially be used
+/// for code injection or other purposes.
+/// </summary>
+///-------------------------------------------------------------------------------------------------
+/// <author>Hence0x</author>
+/// <date>2024-07-26</date>
+///-------------------------------------------------------------------------------------------------
+/// <description>
+/// This tool analyzes PE files to find code caves of a specified minimum size.
+/// It iterates through all sections of the PE file and reports the location and size of any caves found.
+/// 
+/// Features:
+/// - Analyzes PE file structure
+/// - Finds code caves in all sections
+/// - Configurable minimum cave size
+/// - Reports cave locations and sizes
+/// 
+/// Usage:
+/// PECaveFinder.exe <PE_file> <min_cave_size>
+/// 
+///-------------------------------------------------------------------------------------------------
+/// <dependencies>
+/// - Windows API: For PE file structure definitions
+/// </dependencies>
+///-------------------------------------------------------------------------------------------------
+/// <compilation>
+/// Compile with a C compiler that supports C99 or later.
+/// Ensure Windows SDK is available for necessary header files.
+/// </compilation>
+///-------------------------------------------------------------------------------------------------
 
 #define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
 
-/**
- * @brief Finds and prints information about caves in a PE file.
- * 
- * This function reads a PE file, analyzes its sections, and identifies
- * contiguous areas of zero bytes (caves) that are at least as large as
- * the specified minimum size.
- * 
- * @param fname The filename of the PE file to analyze.
- * @param min_cave The minimum size of caves to report, in bytes.
- * 
- * @remarks This function uses Windows-specific structures to parse the PE file.
- *          It assumes a valid PE file format and does minimal error checking.
- */
+///-------------------------------------------------------------------------------------------------
+/// <summary>
+/// Finds and prints code caves in a PE file.
+/// </summary>
+/// <param name="fname">The filename of the PE file to analyze.</param>
+/// <param name="min_cave">The minimum size of code caves to report.</param>
+/// <remarks>
+/// This function reads the PE file, parses its structure, and searches for continuous
+/// sequences of zero bytes (caves) in each section. It reports caves that are at least
+/// as large as the specified minimum size.
+/// </remarks>
+///-------------------------------------------------------------------------------------------------
 void fcaves(const char* fname, int min_cave) {
     FILE* f = fopen(fname, "rb");
     if (!f) {
@@ -47,7 +64,7 @@ void fcaves(const char* fname, int min_cave) {
     long fsize = ftell(f);
     fseek(f, 0, SEEK_SET);
 
-    // Allocate buffer and read file contents
+    // Allocate buffer and read file content
     unsigned char* buf = (unsigned char*)malloc(fsize);
     if (!buf) {
         printf("Memory allocation failed.\n");
@@ -60,7 +77,7 @@ void fcaves(const char* fname, int min_cave) {
     // Parse PE headers
     PIMAGE_DOS_HEADER dh = (PIMAGE_DOS_HEADER)buf;
     PIMAGE_NT_HEADERS nh = (PIMAGE_NT_HEADERS)(buf + dh->e_lfanew);
-    
+
     // Iterate through sections
     PIMAGE_SECTION_HEADER sec = IMAGE_FIRST_SECTION(nh);
     for (int i = 0; i < nh->FileHeader.NumberOfSections; i++, sec++) {
@@ -92,21 +109,18 @@ void fcaves(const char* fname, int min_cave) {
     free(buf);
 }
 
-/**
- * @brief Main entry point for the PE cave finder program.
- * 
- * @param argc The number of command-line arguments.
- * @param argv The array of command-line argument strings.
- * 
- * @return int 0 if the program executed successfully, 1 otherwise.
- * 
- * @remarks Usage: pe_cave_finder.exe <PE_file> <min_cave_size>
- * 
- * Example:
- * @code
- * pe_cave_finder.exe example.exe 100
- * @endcode
- */
+///-------------------------------------------------------------------------------------------------
+/// <summary>
+/// Main entry point of the program.
+/// </summary>
+/// <param name="argc">The number of command-line arguments.</param>
+/// <param name="argv">Array of command-line argument strings.</param>
+/// <returns>0 if the program executes successfully, 1 if there's an error in arguments.</returns>
+/// <remarks>
+/// This function handles command-line arguments and calls the fcaves function
+/// to analyze the specified PE file.
+/// </remarks>
+///-------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         printf("Usage: %s <PE_file> <min_cave_size>\n", argv[0]);
